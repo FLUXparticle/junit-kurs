@@ -57,7 +57,7 @@ public class CocktailService {
         return result;
     }
 
-    private List<Cocktail> getAllCocktailsWithIngredients(Set<Long> ingredientIDs) {
+    public List<Cocktail> getAllCocktailsWithIngredients(Set<Long> ingredientIDs) {
         return cocktailRepository.findCocktailsByIngredients(ingredientIDs);
     }
 

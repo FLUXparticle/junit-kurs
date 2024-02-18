@@ -4,17 +4,13 @@ import com.example.cocktails.repository.*;
 import com.example.cocktails.service.*;
 import com.google.inject.*;
 import com.sun.net.httpserver.*;
-import org.json.simple.*;
 
-import java.io.*;
-import java.net.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
-public class CocktailController implements HttpHandler {
+public class CocktailController extends AbstractController {
 
-    public static final String GET = "GET";
     private final CocktailService cocktailService;
 
     @Inject
@@ -23,43 +19,25 @@ public class CocktailController implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+    protected Object handleGetRequest(HttpExchange exchange) {
         String path = exchange.getRequestURI().getPath().substring(4);
-        try {
-            if (method.equals(GET) && path.equals("/cocktails")) {
-                sendResponse(exchange, HttpURLConnection.HTTP_OK, cocktails());
-            } else if (method.equals(GET) && path.startsWith("/cocktails/")) {
-                long id = Long.parseLong(path.substring(11));
-                sendResponse(exchange, HttpURLConnection.HTTP_OK, cocktail(id));
-            } else if (method.equals(GET) && path.equals("/ingredients")) {
-                sendResponse(exchange, HttpURLConnection.HTTP_OK, ingredients());
-            } else if (method.equals(GET) && path.startsWith("/ingredients/")) {
-                long id = Long.parseLong(path.substring(13));
-                sendResponse(exchange, HttpURLConnection.HTTP_OK, ingredient(id));
-            } else if (method.equals(GET) && path.equals("/search")) {
-                String query = exchange.getRequestURI().getQuery()
-                        .substring(6)
-                        .replace('+', ' ');
-                sendResponse(exchange, HttpURLConnection.HTTP_OK, search(query));
-            } else {
-                sendResponse(exchange, HttpURLConnection.HTTP_NOT_FOUND, Map.of("error", "Not Found"));
-            }
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            sendResponse(exchange, HttpURLConnection.HTTP_INTERNAL_ERROR, Map.of("error", "Internal Server Error"));
-        }
-    }
-
-    private void sendResponse(HttpExchange exchange, int statusCode, Object responseBody) throws IOException {
-        byte[] responseBytes = Jsoner.serialize(responseBody).getBytes();
-
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(statusCode, responseBytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(responseBytes);
+        if (path.equals("/cocktails")) {
+            return cocktails();
+        } else if (path.startsWith("/cocktails/")) {
+            long id = Long.parseLong(path.substring(11));
+            return cocktail(id);
+        } else if (path.equals("/ingredients")) {
+            return ingredients();
+        } else if (path.startsWith("/ingredients/")) {
+            long id = Long.parseLong(path.substring(13));
+            return ingredient(id);
+        } else if (path.equals("/search")) {
+            String query = exchange.getRequestURI().getQuery()
+                    .substring(6)
+                    .replace('+', ' ');
+            return search(query);
+        } else {
+            return null;
         }
     }
 

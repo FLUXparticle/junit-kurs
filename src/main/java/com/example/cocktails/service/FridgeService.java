@@ -1,9 +1,11 @@
 package com.example.cocktails.service;
 
-import com.google.inject.*;
 import com.example.cocktails.repository.*;
+import com.google.inject.*;
 
 import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 public class FridgeService {
 
@@ -30,32 +32,24 @@ public class FridgeService {
     }
 
     public Collection<Cocktail> getPossibleCocktails() {
-        Collection<Cocktail> allCocktails = cocktailService.getAllCocktails();
-        Collection<Ingredient> fridgeIngredients = getFridgeIngredients();
+        Set<Long> fridgeIngredientIDs = getFridgeIngredients().stream()
+                .map(Ingredient::getId)
+                .collect(toSet());
 
-        Collection<Cocktail> possibleCocktails = new ArrayList<>();
-
-        for (Cocktail cocktail : allCocktails) {
-            boolean possible = true;
-            for (Instruction instruction : cocktail.getInstructions()) {
-                if (!fridgeIngredients.contains(instruction.getIngredient())) {
-                    possible = false;
-                    break;
-                }
-            }
-            if (possible) {
-                possibleCocktails.add(cocktail);
-            }
-        }
-
-        return possibleCocktails;
+        return cocktailService.getAllCocktailsWithIngredients(fridgeIngredientIDs).stream()
+                .filter(cocktail -> cocktail.getInstructions().stream()
+                        .map(Instruction::getIngredient)
+                        .map(Ingredient::getId)
+                        .allMatch(fridgeIngredientIDs::contains)
+                )
+                .collect(toList());
     }
 
     public Set<Ingredient> getShoppingList() {
         Collection<Ingredient> allIngredients = cocktailService.getAllIngredients();
         Collection<Ingredient> fridgeIngredients = getFridgeIngredients();
 
-        Set<Ingredient> missing = new HashSet<>(allIngredients);
+        Set<Ingredient> missing = new TreeSet<>(allIngredients);
         missing.removeAll(fridgeIngredients);
 
         return missing;

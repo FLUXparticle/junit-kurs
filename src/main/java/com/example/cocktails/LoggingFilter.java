@@ -11,7 +11,7 @@ public class LoggingFilter extends Filter {
         try {
             chain.doFilter(exchange);
         } finally {
-            System.out.printf("%s %25s -> %s Content-Type: %s\n",
+            System.out.printf("%5s %25s -> %s Content-Type: %s\n",
                     exchange.getRequestMethod(),
                     exchange.getRequestURI().getPath(),
                     exchange.getResponseCode(),

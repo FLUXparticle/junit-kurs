@@ -29,7 +29,11 @@ app.config(function($routeProvider) {
             templateUrl: 'search.html',
             controller: 'SearchController'
         })
-        .when('/shopping', {
+        .when('/user/fridge', {
+            templateUrl: 'fridge.html',
+            controller: 'FridgeController'
+        })
+        .when('/user/shopping', {
             templateUrl: 'shopping.html',
             controller: 'ShoppingController'
         })
@@ -68,7 +72,6 @@ app.controller('IngredientDetailController', function($scope, $routeParams, $htt
 
 app.controller('SearchController', function($scope, $http, $location) {
     $scope.query = $location.search().query || '';
-    $scope.results = [];
 
     if ($scope.query) {
         // Führe die Suche durch
@@ -81,6 +84,46 @@ app.controller('SearchController', function($scope, $http, $location) {
     $scope.search = function() {
         // Aktualisiere die URL mit dem Such-Query
         $location.search('query', $scope.query);
+    };
+});
+
+app.controller('FridgeController', function($scope, $http) {
+    $scope.updateFridge = function() {
+        $scope.inFridge = $scope.fridge.filter(function(ingredient) {
+            return ingredient.inFridge;
+        });
+        $scope.notInFridge = $scope.fridge.filter(function(ingredient) {
+            return !ingredient.inFridge;
+        });
+    }
+
+    // Hilfsfunktion zum Ändern einer Zutat
+    $scope.updateIngredient = function(id, inFridge) {
+        $scope.fridge.forEach(function(ingredient) {
+            if (ingredient.id === id) {
+                ingredient.inFridge = inFridge;
+            }
+        });
+        $scope.updateFridge();
+        $http.patch('/api/user/fridge/' + id, { inFridge: inFridge })
+    }
+
+    // Initialisierung beim Laden der Seite
+    $http.get('/api/user/fridge')
+        .then(function(response) {
+            $scope.fridge = response.data;
+            $scope.updateFridge();
+        });
+
+    // Funktion zum Hinzufügen einer Zutat zum Kühlschrank
+    $scope.addToFridge = function(id) {
+        // Aktualisiere die inFridge-Eigenschaft der Zutat
+        $scope.updateIngredient(id, true)
+    };
+
+    // Funktion zum Entfernen einer Zutat aus dem Kühlschrank
+    $scope.removeFromFridge = function(id) {
+        $scope.updateIngredient(id, false)
     };
 });
 

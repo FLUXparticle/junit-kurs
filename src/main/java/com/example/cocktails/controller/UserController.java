@@ -4,11 +4,14 @@ import com.example.cocktails.repository.*;
 import com.example.cocktails.service.*;
 import com.google.inject.*;
 import com.sun.net.httpserver.*;
+import org.json.simple.*;
 
 import java.io.*;
 import java.util.*;
 
-public class UserController implements HttpHandler {
+import static java.util.stream.Collectors.*;
+
+public class UserController extends AbstractController {
 
     private final CocktailService cocktailService;
 
@@ -21,38 +24,54 @@ public class UserController implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        
+    protected Object handleGetRequest(HttpExchange exchange) {
+        String path = exchange.getRequestURI().getPath().substring(9);
+        if (path.equals("/fridge")) {
+            return fridge();
+        } else {
+            return null;
+        }
     }
 
-//    @GetMapping("/fridge")
-    public String fridge() {
+    @Override
+    protected void handlePatchRequest(HttpExchange exchange) throws IOException {
+        String path = exchange.getRequestURI().getPath().substring(9);
+        if (path.startsWith("/fridge/")) {
+            try {
+                long id = Long.parseLong(path.substring(8));
+                JsonObject body = (JsonObject) Jsoner.deserialize(new InputStreamReader(exchange.getRequestBody()));
+                fridge(id, body);
+            } catch (DeserializationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    //    @GetMapping("/fridge")
+    public List<Map<String, Object>> fridge() {
         Collection<Ingredient> allIngredients = cocktailService.getAllIngredients();
         Set<Ingredient> fridgeIngredients = fridgeService.getFridgeIngredients();
 
-        List<FridgeModel> fridgeModels = new ArrayList<>();
-        for (Ingredient ingredient : allIngredients) {
-            fridgeModels.add(new FridgeModel(ingredient, fridgeIngredients.contains(ingredient)));
-        }
-
-//        model.addAttribute("fridgeModels", fridgeModels);
-        return "fridge";
+        return allIngredients.stream()
+                .map(ingredient -> Map.<String, Object>of(
+                        "id", ingredient.getId(),
+                        "name", ingredient.getName(),
+                        "inFridge", fridgeIngredients.contains(ingredient)
+                ))
+                .collect(toList());
     }
 
 //    @PostMapping("/fridge")
-    public String fridge(Long id, String action) {
+    public void fridge(long id, JsonObject body) {
         Ingredient ingredient = cocktailService.getIngredientWithID(id);
 
-        switch (action) {
-            case "add":
-                fridgeService.addIngredient(ingredient);
-                break;
-            case "remove":
-                fridgeService.removeIngredient(ingredient);
-                break;
-        }
+        Boolean inFridge = body.getBoolean("inFridge");
 
-        return "redirect:fridge";
+        if (inFridge) {
+            fridgeService.addIngredient(ingredient);
+        } else {
+            fridgeService.removeIngredient(ingredient);
+        }
     }
 
 //    @GetMapping("/possible")
