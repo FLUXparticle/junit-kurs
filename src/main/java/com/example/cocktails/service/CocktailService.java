@@ -6,6 +6,8 @@ import com.google.inject.name.*;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.*;
+
 public class CocktailService {
 
     private final CocktailRepository cocktailRepository;
@@ -40,15 +42,17 @@ public class CocktailService {
 
     public Collection<Cocktail> search(String query) {
         Collection<Cocktail> cocktailsWithName = cocktailRepository.findByNameContains(query);
+
         Collection<Ingredient> ingredientsWithName = ingredientRepository.findByNameContains(query);
 
-        Set<Long> ingredientIDs = new HashSet<>();
-        for (Ingredient ingredient : ingredientsWithName) {
-            ingredientIDs.add(ingredient.getId());
-        }
+        Set<Long> ingredientIDs = ingredientsWithName.stream()
+                .map(Ingredient::getId)
+                .collect(toSet());
 
-        SortedSet<Cocktail> result = new TreeSet<>(); // getAllCocktailsWithIngredients(ingredientIDs);
-//        result.addAll(cocktailsWithName);
+        List<Cocktail> cocktailsWithIngredients = getAllCocktailsWithIngredients(ingredientIDs);
+
+        Set<Cocktail> result = new TreeSet<>(cocktailsWithIngredients);
+        result.addAll(cocktailsWithName);
 
         return result;
     }

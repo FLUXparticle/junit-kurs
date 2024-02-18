@@ -25,6 +25,10 @@ app.config(function($routeProvider) {
             templateUrl: 'ingredient-detail.html',
             controller: 'IngredientDetailController'
         })
+        .when('/search', {
+            templateUrl: 'search.html',
+            controller: 'SearchController'
+        })
         .when('/shopping', {
             templateUrl: 'shopping.html',
             controller: 'ShoppingController'
@@ -60,6 +64,24 @@ app.controller('IngredientDetailController', function($scope, $routeParams, $htt
         .then(function(response) {
             $scope.ingredient = response.data;
         });
+});
+
+app.controller('SearchController', function($scope, $http, $location) {
+    $scope.query = $location.search().query || '';
+    $scope.results = [];
+
+    if ($scope.query) {
+        // Führe die Suche durch
+        $http.get('/api/search', {params: {query: $scope.query}})
+            .then(function (response) {
+                $scope.results = response.data;
+            })
+    }
+
+    $scope.search = function() {
+        // Aktualisiere die URL mit dem Such-Query
+        $location.search('query', $scope.query);
+    };
 });
 
 app.controller('ShoppingController', function($scope, $http) {

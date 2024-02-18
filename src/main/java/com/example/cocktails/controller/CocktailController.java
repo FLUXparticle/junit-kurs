@@ -37,6 +37,11 @@ public class CocktailController implements HttpHandler {
             } else if (method.equals(GET) && path.startsWith("/ingredients/")) {
                 long id = Long.parseLong(path.substring(13));
                 sendResponse(exchange, HttpURLConnection.HTTP_OK, ingredient(id));
+            } else if (method.equals(GET) && path.equals("/search")) {
+                String query = exchange.getRequestURI().getQuery()
+                        .substring(6)
+                        .replace('+', ' ');
+                sendResponse(exchange, HttpURLConnection.HTTP_OK, search(query));
             } else {
                 sendResponse(exchange, HttpURLConnection.HTTP_NOT_FOUND, Map.of("error", "Not Found"));
             }
@@ -58,21 +63,14 @@ public class CocktailController implements HttpHandler {
         }
     }
 
-    //    @GetMapping("/")
-    public String main() {
-        return "index";
-    }
-
-//    @GetMapping("/search")
-    public String search() {
-        return "search";
-    }
-
 //    @PostMapping("/search")
-    public String search(String query) {
-        Collection<Cocktail> cocktails = cocktailService.search(query);
-//        model.addAttribute("cocktails", cocktails);
-        return "result";
+    public List<Map<String, Object>> search(String query) {
+        return cocktailService.search(query).stream()
+                .map(cocktail -> Map.<String, Object>of(
+                        "id", cocktail.getId(),
+                        "name", cocktail.getName()
+                ))
+                .collect(toList());
     }
 
 //    @GetMapping("/cocktails")

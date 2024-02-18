@@ -15,6 +15,11 @@ public interface IngredientRepository {
     @SqlQuery("SELECT id, name FROM ingredient ORDER BY name")
     Collection<Ingredient> findAll();
 
-    Collection<Ingredient> findByNameContains(String query);
+    @SqlQuery("SELECT id, name FROM ingredient WHERE name LIKE :query")
+    Collection<Ingredient> getIngredients(@Bind("query") String query);
+
+    default Collection<Ingredient> findByNameContains(String query) {
+        return getIngredients("%" + query + "%");
+    }
 
 }
