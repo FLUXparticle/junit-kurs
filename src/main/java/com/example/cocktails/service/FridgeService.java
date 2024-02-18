@@ -7,6 +7,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
+@Singleton
 public class FridgeService {
 
     private final CocktailService cocktailService;
@@ -36,7 +37,9 @@ public class FridgeService {
                 .map(Ingredient::getId)
                 .collect(toSet());
 
-        return cocktailService.getAllCocktailsWithIngredients(fridgeIngredientIDs).stream()
+        List<Cocktail> allCocktailsWithIngredients = cocktailService.getAllCocktailsWithIngredients(fridgeIngredientIDs, true);
+
+        return allCocktailsWithIngredients.stream()
                 .filter(cocktail -> cocktail.getInstructions().stream()
                         .map(Instruction::getIngredient)
                         .map(Ingredient::getId)

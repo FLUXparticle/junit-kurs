@@ -33,6 +33,10 @@ app.config(function($routeProvider) {
             templateUrl: 'fridge.html',
             controller: 'FridgeController'
         })
+        .when('/user/possible', {
+            templateUrl: 'possible.html',
+            controller: 'PossibleController'
+        })
         .when('/user/shopping', {
             templateUrl: 'shopping.html',
             controller: 'ShoppingController'
@@ -127,26 +131,16 @@ app.controller('FridgeController', function($scope, $http) {
     };
 });
 
-app.controller('ShoppingController', function($scope, $http) {
-    // initialize shoppingList as empty map
-    $scope.shoppingList = {}; // new Map();
-
-    $http.get('/api/shopping')
+app.controller('PossibleController', function($scope, $http) {
+    $http.get('/api/user/possible')
         .then(function(response) {
-            $scope.cocktailsList = response.data;
+            $scope.cocktails = response.data;
         });
+});
 
-    // function to add missing ingredients to shopping list
-    $scope.addToShoppingList = function(index) {
-        const ingredients = $scope.cocktailsList[index].missingIngredients;
-        for (var i = 0; i < ingredients.length; i++) {
-            var ingredient = ingredients[i];
-            $scope.shoppingList[ingredient] = true;
-            // $scope.shoppingList.set(ingredient, true);
-        }
-    };
-
-    $scope.shoppingListNotEmpty = function() {
-        return Object.keys($scope.shoppingList).length > 0;
-    };
+app.controller('ShoppingController', function($scope, $http) {
+    $http.get('/api/user/shopping')
+        .then(function(response) {
+            $scope.ingredients = response.data;
+        });
 });

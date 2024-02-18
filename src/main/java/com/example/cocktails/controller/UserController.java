@@ -28,6 +28,10 @@ public class UserController extends AbstractController {
         String path = exchange.getRequestURI().getPath().substring(9);
         if (path.equals("/fridge")) {
             return fridge();
+        } else if (path.equals("/possible")) {
+            return possible();
+        } else if (path.equals("/shopping")) {
+            return shopping();
         } else {
             return null;
         }
@@ -75,17 +79,23 @@ public class UserController extends AbstractController {
     }
 
 //    @GetMapping("/possible")
-    public String possible() {
-        Collection<Cocktail> cocktails = fridgeService.getPossibleCocktails();
-//        model.addAttribute("cocktails", cocktails);
-        return "possible";
+    public List<Map<String, Object>> possible() {
+        return fridgeService.getPossibleCocktails().stream()
+                .map(cocktail -> Map.<String, Object>of(
+                        "id", cocktail.getId(),
+                        "name", cocktail.getName()
+                ))
+                .collect(toList());
     }
 
 //    @GetMapping("/shopping")
-    public String shopping() {
-        Set<Ingredient> shoppingList = fridgeService.getShoppingList();
-//        model.addAttribute("shoppingList", shoppingList);
-        return "shopping";
+    public List<Map<String, Object>> shopping() {
+        return fridgeService.getShoppingList().stream()
+                .map(ingredient -> Map.<String, Object>of(
+                        "id", ingredient.getId(),
+                        "name", ingredient.getName()
+                ))
+                .collect(toList());
     }
 
 }

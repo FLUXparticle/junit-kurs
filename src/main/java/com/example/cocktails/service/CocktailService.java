@@ -6,8 +6,10 @@ import com.google.inject.name.*;
 
 import java.util.*;
 
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 
+@Singleton
 public class CocktailService {
 
     private final CocktailRepository cocktailRepository;
@@ -29,7 +31,7 @@ public class CocktailService {
     }
 
     public Collection<Cocktail> getAllCocktailsWithIngredient(Long ingredientsId) {
-        return getAllCocktailsWithIngredients(Collections.singleton(ingredientsId));
+        return getAllCocktailsWithIngredients(Collections.singleton(ingredientsId), false);
     }
 
     public Cocktail getCocktailWithID(Long id) {
@@ -49,7 +51,7 @@ public class CocktailService {
                 .map(Ingredient::getId)
                 .collect(toSet());
 
-        List<Cocktail> cocktailsWithIngredients = getAllCocktailsWithIngredients(ingredientIDs);
+        List<Cocktail> cocktailsWithIngredients = getAllCocktailsWithIngredients(ingredientIDs, false);
 
         Set<Cocktail> result = new TreeSet<>(cocktailsWithIngredients);
         result.addAll(cocktailsWithName);
@@ -57,8 +59,16 @@ public class CocktailService {
         return result;
     }
 
-    public List<Cocktail> getAllCocktailsWithIngredients(Set<Long> ingredientIDs) {
-        return cocktailRepository.findCocktailsByIngredients(ingredientIDs);
+    public List<Cocktail> getAllCocktailsWithIngredients(Set<Long> ingredientIDs, boolean withInstructions) {
+        if (ingredientIDs.isEmpty()) {
+            return emptyList();
+        } else {
+            List<Cocktail> cocktails = cocktailRepository.findCocktailsByIngredients(ingredientIDs);
+            if (withInstructions) {
+                cocktails.forEach(cocktailRepository::fetchDetails);
+            }
+            return cocktails;
+        }
     }
 
 }

@@ -18,7 +18,7 @@ public interface CocktailRepository {
     List<Cocktail> getCocktails(@Bind("query") String query);
 
     @RegisterConstructorMapper(Cocktail.class)
-    @SqlQuery("SELECT cocktail.id, name FROM cocktail JOIN instruction ON cocktail.id = instruction.instructions_id WHERE instruction.ingredient_id IN (<ingredientIDs>) ORDER BY name")
+    @SqlQuery("SELECT DISTINCT cocktail.id, name FROM cocktail JOIN instruction ON cocktail.id = instruction.instructions_id WHERE instruction.ingredient_id IN (<ingredientIDs>) ORDER BY name")
     List<Cocktail> findCocktailsByIngredients(@BindList("ingredientIDs") Set<Long> ingredientIDs);
 
     @RegisterJoinRowMapper({Instruction.class, Ingredient.class})
@@ -31,7 +31,7 @@ public interface CocktailRepository {
         return getCocktail(id).map(this::fetchDetails);
     }
 
-    private Cocktail fetchDetails(Cocktail cocktail) {
+    default Cocktail fetchDetails(Cocktail cocktail) {
         List<JoinRow> joinRows = getCocktailDetails(cocktail.getId());
 
         for (JoinRow joinRow : joinRows) {
