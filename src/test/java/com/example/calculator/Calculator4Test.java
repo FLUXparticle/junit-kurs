@@ -1,10 +1,10 @@
 package com.example.calculator;
 
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.runner.*;
+import org.junit.runners.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -46,5 +46,11 @@ public class Calculator4Test {
             assertEquals(3, result);
         }
 
+        @Test(expected = ArithmeticException.class)
+        public void exception() {
+            calculator.divide(9, 0);
+        }
+
     }
+
 }

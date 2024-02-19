@@ -1,9 +1,8 @@
 package com.example.calculator;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Calculator Tests")
 public class Calculator5Test {
@@ -28,8 +27,8 @@ public class Calculator5Test {
     }
 
     @Nested
-    @DisplayName("Subtraction Tests")
-    class SubtractionTests {
+    @DisplayName("Multiplication Tests")
+    class MultiplicationTests {
 
         @Test
         void multiplyTwoNumbers() {
@@ -43,5 +42,13 @@ public class Calculator5Test {
             assertEquals(3, result);
         }
 
+        @Test
+        void exception() {
+            assertThrowsExactly(ArithmeticException.class, () -> {
+                calculator.divide(9, 0);
+            });
+        }
+
     }
+
 }
