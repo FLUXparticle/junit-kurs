@@ -13,8 +13,13 @@ import java.net.*;
 public class CocktailApp {
 
     public static Injector getReleaseInjector() {
+        try {
+            Class.forName("net.sf.log4jdbc.DriverSpy");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:sqlite::resource:cocktails.db");
+        dataSource.setUrl("jdbc:log4jdbc:sqlite::resource:cocktails.db");
 
         return Guice.createInjector(
                 new JdbiModule(),
