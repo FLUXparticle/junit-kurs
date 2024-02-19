@@ -2,7 +2,12 @@ package com.example.calculator;
 
 import org.junit.jupiter.api.*;
 
+import java.util.*;
+import java.util.stream.*;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicContainer.*;
+import static org.junit.jupiter.api.DynamicTest.*;
 
 @DisplayName("Calculator Tests")
 public class Calculator5Test {
@@ -47,6 +52,22 @@ public class Calculator5Test {
             assertThrowsExactly(ArithmeticException.class, () -> {
                 calculator.divide(9, 0);
             });
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Permutation Tests")
+    class PermutationTests {
+
+        @TestFactory
+        Stream<DynamicContainer> dynamicTestsWithCollection() {
+            List<Integer> values = List.of(1, 2, 3);
+
+            return values.stream()
+                    .map(a -> dynamicContainer("First Value: " + a, values.stream()
+                            .map(b -> dynamicTest("Second Value: " + b, () -> assertEquals(a + b, calculator.add(a, b))))
+                    ));
         }
 
     }
