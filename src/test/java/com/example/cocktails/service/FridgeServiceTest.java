@@ -12,11 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FridgeServiceTest {
 
+    public static Injector getReleaseInjector() {
+        return CocktailApp.getReleaseInjector();
+    }
+
+    public static Injector getTestInjector() {
+        return Guice.createInjector(new TestModule());
+    }
+
     @Test
     void getPossibleCocktails() throws IOException {
         Collection<Cocktail> expected = List.of(new Cocktail(27L, "Pink Power"));
 
-        Injector injector = CocktailApp.getReleaseInjector();
+        Injector injector = getTestInjector();
 
         CocktailService cocktailService = injector.getInstance(CocktailService.class);
         FridgeService fridgeService = injector.getInstance(FridgeService.class);
