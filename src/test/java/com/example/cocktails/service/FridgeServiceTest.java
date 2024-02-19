@@ -7,7 +7,10 @@ import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FridgeServiceTest {
@@ -21,8 +24,8 @@ class FridgeServiceTest {
     }
 
     @Test
-    void getPossibleCocktails() throws IOException {
-        Collection<Cocktail> expected = List.of(new Cocktail(27L, "Pink Power"));
+    void getPossibleCocktails1() throws IOException {
+        Collection<Cocktail> expectedList = List.of(new Cocktail(27L, "Pink Power"));
 
         Injector injector = getTestInjector();
 
@@ -35,9 +38,27 @@ class FridgeServiceTest {
         fridgeService.addIngredient(ingredient1);
         fridgeService.addIngredient(ingredient2);
 
-        Collection<Cocktail> actual = fridgeService.getPossibleCocktails();
+        Collection<Cocktail> actualList = fridgeService.getPossibleCocktails();
 
-        assertIterableEquals(expected, actual);
+        assertIterableEquals(expectedList, actualList);
+    }
+
+    @Test
+    void getPossibleCocktails2() throws IOException {
+        Collection<Cocktail> expectedList = List.of(new Cocktail(3L, "Summerfeeling"), new Cocktail(27L, "Pink Power"));
+
+        Injector injector = getReleaseInjector();
+
+        CocktailService cocktailService = injector.getInstance(CocktailService.class);
+        FridgeService fridgeService = injector.getInstance(FridgeService.class);
+
+        LongStream.of(9, 30, 7, 8)
+                .mapToObj(cocktailService::getIngredientWithID)
+                .forEach(fridgeService::addIngredient);
+
+        Collection<Cocktail> actualList = fridgeService.getPossibleCocktails();
+
+        assertThat(actualList, containsInAnyOrder(expectedList.toArray()));
     }
 
 }

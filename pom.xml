@@ -117,6 +117,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Hamcrest -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JUnit 4-Test mit JUnit 5-Engine ausführen -->
         <dependency>
             <groupId>org.junit.vintage</groupId>
