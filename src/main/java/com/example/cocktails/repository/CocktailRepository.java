@@ -16,6 +16,7 @@ public interface CocktailRepository extends Repository<Cocktail, Long> {
     Collection<Cocktail> findAll();
 
     Collection<Cocktail> findByNameContains(String query);
+    Collection<Cocktail> findByNameContainsIgnoreCase(String query);
 
     Collection<Cocktail> findDistinctByInstructionsIngredientIdIn(Collection<Long> ingredientIDs);
 

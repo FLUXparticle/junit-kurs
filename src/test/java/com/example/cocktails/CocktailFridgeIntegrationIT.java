@@ -37,7 +37,35 @@ class CocktailFridgeIntegrationIT {
 
     @Test
     void testPossibleContainsPinkPowerForIngredients7And30() {
-        // TODO Die Zutaten mit den IDs 7, 30 zum Kühlschrank hinzufügen und testen, ob der "Pink Power" damit möglich ist
+        given()
+                .filter(session)
+                .contentType("application/json")
+                .body("""
+                      {"inFridge":true}
+                      """)
+                .when()
+                .patch("/api/fridge/ingredients/{id}", 7L)
+                .then()
+                .statusCode(200);
+
+        given()
+                .filter(session)
+                .contentType("application/json")
+                .body("""
+                      {"inFridge":true}
+                      """)
+                .when()
+                .patch("/api/fridge/ingredients/{id}", 30L)
+                .then()
+                .statusCode(200);
+
+        given()
+                .filter(session)
+                .when()
+                .get("/api/fridge/possible")
+                .then()
+                .statusCode(200)
+                .body("name", hasItem("Pink Power"));
     }
 
 }

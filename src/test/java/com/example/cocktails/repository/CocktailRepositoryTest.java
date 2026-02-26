@@ -30,15 +30,22 @@ class CocktailRepositoryTest {
         Cocktail cocktail = new Cocktail("Mojito", List.of(instruction));
         cocktailRepository.save(cocktail);
 
-        // TODO Testen, ob der Cocktail auch gefunden wird, wenn der Name klein geschrieben wird
-        // TODO Durch hinzufügen von `findByNameContainsIgnoreCase` im Repository beheben
-        Collection<Cocktail> found = cocktailRepository.findByNameContains("Mojito");
+        Collection<Cocktail> found = cocktailRepository.findByNameContainsIgnoreCase("mojito");
         assertThat(found).isNotEmpty();
     }
 
     @Test
     void testFindByIngredientId() {
-        // TODO Testen, ob der Cocktail auch gefunden wird, wenn man nach der ID der Zutat sucht
+        // Testdaten anlegen
+        Ingredient ingredient = new Ingredient(1L, "Minze");
+        Ingredient savedIngredient = ingredientRepository.save(ingredient);
+
+        Instruction instruction = new Instruction(null, savedIngredient);
+        Cocktail cocktail = new Cocktail("Mojito", List.of(instruction));
+        cocktailRepository.save(cocktail);
+
+        Collection<Cocktail> found = cocktailRepository.findDistinctByInstructionsIngredientIdIn(Set.of(1L));
+        assertThat(found).isNotEmpty();
     }
 
 }

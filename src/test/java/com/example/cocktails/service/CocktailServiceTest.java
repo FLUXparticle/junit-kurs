@@ -24,7 +24,6 @@ class CocktailServiceTest {
     @InjectMocks
     private CocktailService cocktailService;
 
-    // TODO Eine weitere Test-Klasse schreiben, die Fake-Klassen für die Repositories verwendet
     @Test
     void testSearch() {
         String query = "Minze";
