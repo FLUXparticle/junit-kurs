@@ -14,7 +14,6 @@ public class OtherService {
     }
 
     public void doWork(String filename) {
-        // TODO
         Path path = Paths.get(filename);
         if (!Files.exists(path)) {
             return;

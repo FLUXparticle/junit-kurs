@@ -10,6 +10,8 @@ public interface CocktailRepository extends Repository<Cocktail, Long> {
 
     Optional<Cocktail> findById(Long id);
 
+    Cocktail save(Cocktail cocktail);
+
     @NonNull
     Collection<Cocktail> findAll();
 
